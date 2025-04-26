@@ -1,66 +1,77 @@
-# Backup your ChatGPT conversations
+# ChatGPT Backup Tool
 
-A single client side script to backup your entire conversation history on [chat.openai.com](https://chat.openai.com). The output is a single JSON file of your history.
+Dieses Tool ermöglicht es dir, deine ChatGPT-Konversationen zu sichern und zu verwalten. Es wurde erweitert, um Backups auszuwählen und automatisch mit GitHub zu synchronisieren.
 
-## You can now preview your backups by opening `index.html` locally
+## Funktionen
 
-1. Clone the repo: `git clone https://github.com/abacaj/chatgpt-backup.git`
-2. Open `index.html` in your browser
-3. Load the file from the top left
+- **Backup erstellen**: Exportiere alle deine ChatGPT-Konversationen in eine JSON-Datei
+- **Backup anzeigen**: Lade bestehende Backup-Dateien und durchsuche deine Konversationen
+- **Markdown-Export**: Exportiere einzelne Konversationen als Markdown-Dateien
+- **Backup-Auswahl**: Wähle bestehende Backup-Dateien zum Anzeigen aus
+- **GitHub-Integration**: Automatisches Pushen von Änderungen an dein GitHub-Repository
 
-![Preview](assets/preview.png)
+## Installation
 
-## How to use
+1. Repository klonen:
+   ```
+   git clone https://github.com/Keyvanhardani/chatgpt-backup.git
+   cd chatgpt-backup
+   ```
 
-1. Visit https://chat.openai.com
-2. Make sure you are logged in
-3. Open chrome console or firefox console (F12 on keyboard)
-4. Click on "Console" tab
-5. Copy the entire script content found in file backup.js and paste into the console input field at the bottom
-6. Press enter, script starts and will log progress to console
-   ![Progress](assets/progress.png)
-7. If it fails at any point you can check the console logs to see the offset it failed at
-8. You can run from any offset by adjusting the script offsets found at the bottom of the script:
+2. Öffne `index.html` in deinem Browser oder hoste die Dateien auf einem Webserver.
 
-```js
-const START_OFFSET = 0;
-const STOP_OFFSET = -1;
-```
+## Verwendung
 
-## How it works
+### Backup erstellen
 
-This uses the same frontend API that is used by your client browser.
+1. Öffne die `index.html`-Datei in deinem Browser
+2. Klicke auf "Create New Backup"
+3. Konfiguriere die Backup-Parameter (Start-Offset, Stop-Offset)
+4. Klicke auf "Start Backup"
+5. Warte, bis der Vorgang abgeschlossen ist
+6. Die JSON-Datei wird automatisch heruntergeladen und in der Anwendung geladen
 
-## Benefits
+### Bestehendes Backup laden
 
-Some of the key benefits:
+1. Öffne die `index.html`-Datei in deinem Browser
+2. Klicke auf "Load Existing Backup"
+3. Wähle eine zuvor erstellte JSON-Backup-Datei aus
 
-- Nothing to download or install
-- Tested on chrome, firefox
-- Fully client side, single script, copy paste to run
-- Respects rate limits
-- Fails early
-- Adjust offsets if you have many conversations, ex. start at 0 to 500, then run 500 to 1000
-- **Fully auditable code in the backup.js file, no third parties**
+### Konversationen als Markdown exportieren
 
-## Use cases
+1. Lade ein Backup wie oben beschrieben
+2. Finde die Konversation, die du exportieren möchtest
+3. Klicke auf das Download-Symbol neben der Konversation
+4. Die Konversation wird als Markdown-Datei heruntergeladen
 
-- Backup your conversation history offline
-- The model output from the current OAI terms state that they belong to you
-- Useful if you need to look back when the service is down
-- Intended as a read-only backup (the ids aren't stored)
+## GitHub-Integration verwenden
 
-## Notes
+Um Änderungen automatisch an dein eigenes GitHub-Repository zu pushen:
 
-- Tested with 700+ conversations
-- Current rate is 60 conversations/minute
-- Roughly 10 minutes for 600 conversations
-- Roughly 1 hour for 6000 conversations
-- This is to respect the OAI API rate limits
-- Keep your browser tab open, you don't need it to be focused for this to finish
-- Chrome **may** prompt you to download the file once it's completed
-- Tested on firefox, requires you to type `allow pasting` before you can paste the script
+1. Stelle sicher, dass Node.js installiert ist
+2. Führe das Update-Skript aus:
+   ```
+   node auto-update.js
+   ```
 
-## Contributors
+## Eigene Anpassungen
 
-- [@FredySandoval](https://github.com/FredySandoval) - Preview backups feature
+Du kannst dieses Tool nach deinen Bedürfnissen anpassen:
+
+- Bearbeite die CSS-Styles in `index.html`, um das Aussehen zu ändern
+- Passe die Backup-Parameter in `backup.js` an, um mehr oder weniger Konversationen zu erfassen
+- Erweitere die GitHub-Integration für zusätzliche Funktionen
+
+## Fehlerbehebung
+
+- **"Failed to fetch token"**: Stelle sicher, dass du bei ChatGPT angemeldet bist
+- **"Failed to fetch conversation ids"**: API-Rate-Limits könnten erreicht sein, warte einige Minuten
+- **GitHub-Synchronisierung schlägt fehl**: Stelle sicher, dass du die korrekten Berechtigungen hast
+
+## Mitwirken
+
+Wenn du Verbesserungen vornehmen möchtest, erstelle einen Fork des Repositories, nimm deine Änderungen vor und sende einen Pull Request.
+
+## Lizenz
+
+Dieses Projekt ist unter der MIT-Lizenz lizenziert.

@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Load JSON File</title>
+    <title>ChatGPT Backup Tool</title>
     <link
       href="https://unpkg.com/primevue/resources/themes/lara-light-indigo/theme.css"
       rel="stylesheet"
@@ -26,6 +26,7 @@
     <script src="https://unpkg.com/primevue/datatable/datatable.min.js"></script>
     <script src="https://unpkg.com/primevue/inputtext/inputtext.min.js"></script>
     <script src="https://unpkg.com/primevue/button/button.min.js"></script>
+    <script src="https://unpkg.com/primevue/dialog/dialog.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
       .column-td {
@@ -78,22 +79,42 @@
         border: 1px solid #ccc;
         padding: 1rem;
         height: 100%;
-        /* word-wrap: break-word; Add this line */
-        /* overflow-wrap: break-word; */
       }
 
       .preview pre {
         white-space: pre-wrap;
-        /* Enable wrapping for <pre> */
         word-wrap: break-word;
-        /* Enable word wrapping for <pre> */
       }
 
       .preview code {
         white-space: pre-wrap;
-        /* Enable wrapping for <code> */
         word-wrap: break-word;
-        /* Enable word wrapping for <code> */
+      }
+
+      .splash-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        padding: 2rem;
+        text-align: center;
+      }
+
+      .splash-container h1 {
+        margin-bottom: 2rem;
+      }
+
+      .splash-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      .file-info {
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+        color: #666;
       }
     </style>
   </head>
@@ -102,9 +123,43 @@
     <div id="app" class="app-container"></div>
 
     <template id="template">
-      <div class="content-container">
+      <div v-if="!output" class="splash-container">
+        <h1>ChatGPT Backup Tool</h1>
+        <p>Choose an option to get started:</p>
+        <div class="splash-buttons">
+          <p-button label="Create New Backup" icon="pi pi-download" class="p-button-primary" @click="startBackup"></p-button>
+          <p-button label="Load Existing Backup" icon="pi pi-upload" @click="openFileSelector"></p-button>
+        </div>
+        <input type="file" id="fileInput" @change="loadJSON" accept=".json" style="display: none;" />
+        <div v-if="selectedFile" class="file-info">
+          Selected file: {{ selectedFile.name }}
+        </div>
+      </div>
+
+      <p-dialog v-model:visible="showBackupDialog" header="Configure Backup" modal style="width: 30vw">
+        <div class="backup-config">
+          <p>Customize your backup parameters:</p>
+          <div class="p-field">
+            <label for="startOffset">Start Offset</label>
+            <p-inputtext id="startOffset" v-model.number="backupConfig.startOffset" type="number" min="0" />
+          </div>
+          <div class="p-field">
+            <label for="stopOffset">Stop Offset (set to -1 for all messages)</label>
+            <p-inputtext id="stopOffset" v-model.number="backupConfig.stopOffset" type="number" min="-1" />
+          </div>
+        </div>
+        <template #footer>
+          <p-button label="Cancel" icon="pi pi-times" @click="showBackupDialog = false" class="p-button-text"></p-button>
+          <p-button label="Start Backup" icon="pi pi-check" @click="runBackup" autofocus></p-button>
+        </template>
+      </p-dialog>
+
+      <div v-if="output" class="content-container">
         <div class="table-container">
-          <input type="file" id="fileInput" @change="loadJSON" accept=".json" />
+          <div style="margin-bottom: 1rem; padding: 0.5rem;">
+            <p-button icon="pi pi-arrow-left" label="Back" @click="resetApp" style="margin-right: 0.5rem;"></p-button>
+            <span v-if="backupFileName">Current backup: {{ backupFileName }}</span>
+          </div>
           <p-datatable :value="output">
             <p-column field="title" header="Title" class="column-td">
               <template #body="slotProps">
@@ -136,37 +191,59 @@
             preview: '',
             selectedChat: false,
             previousChat: null,
+            showBackupDialog: false,
+            selectedFile: null,
+            backupFileName: '',
+            backupConfig: {
+              startOffset: 0,
+              stopOffset: 20
+            }
           };
         },
         methods: {
-          loadJSON() {
-            /**
-             * @typedef {Object} Message - A chat message object.
-             * @property {string} role - The role of the message sender (e.g. "user" or "assistant").
-             * @property {string[]} content - The content of the message as an array of strings.
-             * @property {number} create_time - The timestamp of when the message was created.
-             * @property {string} [model] - The name of the NLP model used to generate the message.
-             */
-            /**
-             * @typedef {Object} Chat - A chat conversation object.
-             * @property {Message[]} messages - An array of messages in the chat.
-             * @property {number} create_time - The timestamp of when the chat was created.
-             * @property {string} [title] - The title of the chat (optional).
-             */
-
-            /**
-             * @typedef {Chat[]} Backup - An array of chat objects representing a backup of a chat log.
-             */
-            const input = document.getElementById('fileInput');
-            const file = input.files[0];
+          openFileSelector() {
+            document.getElementById('fileInput').click();
+          },
+          resetApp() {
+            this.output = null;
+            this.preview = '';
+            this.selectedChat = false;
+            this.previousChat = null;
+            this.selectedFile = null;
+            this.backupFileName = '';
+          },
+          startBackup() {
+            this.showBackupDialog = true;
+          },
+          runBackup() {
+            this.showBackupDialog = false;
+            // Load the backup.js script dynamically
+            const script = document.createElement('script');
+            script.src = 'backup.js';
+            script.onload = () => {
+              // Call the main function from backup.js with our parameters
+              window.runBackup(this.backupConfig.startOffset, this.backupConfig.stopOffset);
+            };
+            document.body.appendChild(script);
+          },
+          loadJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            this.selectedFile = file;
+            this.backupFileName = file.name;
+            
             const reader = new FileReader();
             reader.readAsText(file);
             reader.onload = () => {
-              const json = JSON.parse(reader.result);
-              this.output = json;
-              localStorage.setItem('json_data', JSON.stringify(json));
-
-              console.log(json);
+              try {
+                const json = JSON.parse(reader.result);
+                this.output = json;
+                localStorage.setItem('json_data', JSON.stringify(json));
+                localStorage.setItem('backup_filename', file.name);
+              } catch (error) {
+                alert('Error parsing JSON file: ' + error.message);
+              }
             };
           },
           jsonToMarkdown(json) {
@@ -209,8 +286,11 @@
         },
         mounted() {
           const savedJSON = localStorage.getItem('json_data');
+          const savedFilename = localStorage.getItem('backup_filename');
+          
           if (savedJSON) {
             this.output = JSON.parse(savedJSON);
+            this.backupFileName = savedFilename || '';
           }
         },
         template: '#template',
@@ -218,6 +298,8 @@
           'p-button': primevue.button,
           'p-datatable': primevue.datatable,
           'p-column': primevue.column,
+          'p-dialog': primevue.dialog,
+          'p-inputtext': primevue.inputtext,
         },
       });
       app.directive('ripple', primevue.ripple);
