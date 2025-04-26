@@ -1,14 +1,19 @@
 # ChatGPT Backup Tool
 
-Dieses Tool ermöglicht es dir, deine ChatGPT-Konversationen zu sichern und zu verwalten. Es wurde erweitert, um Backups auszuwählen und automatisch mit GitHub zu synchronisieren.
+Dieses Tool ermöglicht es dir, deine ChatGPT-Konversationen zu sichern und zu verwalten.
 
 ## Funktionen
 
-- **Backup erstellen**: Exportiere alle deine ChatGPT-Konversationen in eine JSON-Datei
-- **Backup anzeigen**: Lade bestehende Backup-Dateien und durchsuche deine Konversationen
+- **Backup erstellen**: Exportiere deine ChatGPT-Konversationen in eine JSON-Datei
+- **Backup-Viewer**: Nutze den integrierten Reader zum Anzeigen und Exportieren von Konversationen
 - **Markdown-Export**: Exportiere einzelne Konversationen als Markdown-Dateien
-- **Backup-Auswahl**: Wähle bestehende Backup-Dateien zum Anzeigen aus
-- **GitHub-Integration**: Automatisches Pushen von Änderungen an dein GitHub-Repository
+
+## Komponenten
+
+Das Projekt besteht aus zwei Hauptkomponenten:
+
+1. **Backup-Tool**: Skript zum Herunterladen und Sichern deiner ChatGPT-Konversationen
+2. **Reader**: Eine eigenständige Webanwendung zum Anzeigen und Exportieren der gesicherten Konversationen
 
 ## Installation
 
@@ -18,55 +23,43 @@ Dieses Tool ermöglicht es dir, deine ChatGPT-Konversationen zu sichern und zu v
    cd chatgpt-backup
    ```
 
-2. Öffne `index.html` in deinem Browser oder hoste die Dateien auf einem Webserver.
+2. Für den Reader die Abhängigkeiten installieren:
+   ```
+   cd reader
+   npm init -y
+   npm install bootstrap marked
+   ```
 
 ## Verwendung
 
 ### Backup erstellen
 
-1. Öffne die `index.html`-Datei in deinem Browser
-2. Klicke auf "Create New Backup"
-3. Konfiguriere die Backup-Parameter (Start-Offset, Stop-Offset)
-4. Klicke auf "Start Backup"
-5. Warte, bis der Vorgang abgeschlossen ist
-6. Die JSON-Datei wird automatisch heruntergeladen und in der Anwendung geladen
+1. Passe die Variablen `START_OFFSET` und `STOP_OFFSET` in der `backup.js` nach Bedarf an
+2. Öffne die ChatGPT-Website und melde dich an
+3. Öffne die Entwicklertools des Browsers und füge den Inhalt von `backup.js` in die Konsole ein
+4. Warte, bis der Backup-Prozess abgeschlossen ist
+5. Die JSON-Datei wird automatisch heruntergeladen
 
-### Bestehendes Backup laden
+### Backup anzeigen
 
-1. Öffne die `index.html`-Datei in deinem Browser
-2. Klicke auf "Load Existing Backup"
-3. Wähle eine zuvor erstellte JSON-Backup-Datei aus
+1. Navigiere zum `reader`-Verzeichnis
+2. Öffne die `index.html`-Datei in einem Browser
+3. Klicke auf "Backup-Datei auswählen" und wähle deine zuvor erstellte JSON-Backup-Datei
+4. Durchsuche deine Konversationen und verwende die Vorschau- und Download-Funktionen
 
-### Konversationen als Markdown exportieren
-
-1. Lade ein Backup wie oben beschrieben
-2. Finde die Konversation, die du exportieren möchtest
-3. Klicke auf das Download-Symbol neben der Konversation
-4. Die Konversation wird als Markdown-Datei heruntergeladen
-
-## GitHub-Integration verwenden
-
-Um Änderungen automatisch an dein eigenes GitHub-Repository zu pushen:
-
-1. Stelle sicher, dass Node.js installiert ist
-2. Führe das Update-Skript aus:
-   ```
-   node auto-update.js
-   ```
-
-## Eigene Anpassungen
+## Anpassungen
 
 Du kannst dieses Tool nach deinen Bedürfnissen anpassen:
 
-- Bearbeite die CSS-Styles in `index.html`, um das Aussehen zu ändern
+- Bearbeite die CSS-Styles im Reader, um das Aussehen zu ändern
 - Passe die Backup-Parameter in `backup.js` an, um mehr oder weniger Konversationen zu erfassen
-- Erweitere die GitHub-Integration für zusätzliche Funktionen
+- Ändere die Markdown-Formatierung nach deinen Wünschen
 
 ## Fehlerbehebung
 
 - **"Failed to fetch token"**: Stelle sicher, dass du bei ChatGPT angemeldet bist
 - **"Failed to fetch conversation ids"**: API-Rate-Limits könnten erreicht sein, warte einige Minuten
-- **GitHub-Synchronisierung schlägt fehl**: Stelle sicher, dass du die korrekten Berechtigungen hast
+- **"Ungültiges JSON"**: Prüfe, ob die Backup-Datei korrekt formatiert ist
 
 ## Mitwirken
 

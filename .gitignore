@@ -102,3 +102,7 @@ dist
 
 # TernJS port file
 .tern-port
+
+# Hidden tool files
+auto-update.js
+github-updater.js
